@@ -42,3 +42,8 @@ module.exports.removeProduct = function(id, callback){
 	var query = { _id:id };
 	Product.remove(query, callback);
 }
+
+module.exports.GetProductsByIds = function(ids, callback){
+
+	Product.where('_id').in(ids).exec(callback);
+}

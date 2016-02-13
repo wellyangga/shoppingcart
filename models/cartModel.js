@@ -61,24 +61,46 @@ module.exports.removeItemsFromChart =  function(id, removedItemId, options, call
 	var cartObj = {};
 
 	Cart.findById(id, function(err,cart){
-		cartObj = cart;
+		
+		if (cart){
+			cartObj = cart;
 
-		var update = {
-			items: []
-		};
+			var update = {
+				items: []
+			};
 
-		for(var index in cartObj.items){
-			if (cartObj.items[index].productId != removedItemId){
-				update.items.push(
-					{ 
-						_id : cartObj.items[index]._id,
-						productId : cartObj.items[index].productId 
-					});
+			for(var index in cartObj.items){
+				if (cartObj.items[index].productId != removedItemId){
+					update.items.push(
+						{ 
+							_id : cartObj.items[index]._id,
+							productId : cartObj.items[index].productId 
+						});
+				}
 			}
+
+			Cart.findOneAndUpdate(query, update, options, callback);
+		}
+		
+	}); 
+}
+
+module.exports.useCoupon = function(id, couponId, options, callback){
+	var query = {_id : id };
+	var update = {
+		couponId : couponId
+	}
+	Cart.findOneAndUpdate(query, update, options, callback);
+}
+
+module.exports.getTotal = function(id, callback){
+	Cart.findById(id, function(err, cart){
+		if (err){
+			throw err;
 		}
 
-		Cart.findOneAndUpdate(query, update, options, callback);
-	}); 
-
-
+		
+	});
 }
+
+

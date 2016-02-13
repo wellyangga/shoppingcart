@@ -79,24 +79,87 @@ var routes = function(Cart, Product, Coupon){
 				if(err){
 					throw err;
 				}
-				res.json("removed");
+				res.status(200);
 			});
 		});
 
 	// coupons
 	cartRouter.route('/:_cartid/coupons')
 		.post(function(req,res){
-			var responseJson = { title : "use coupon in cart" };
+			var couponId = req.body.couponId;
 
-			res.status(201).json(responseJson)
+			Coupon.getCouponById(couponId, function(err, coupon){
+				if(err){
+					throw err;
+				}
+
+				Cart.useCoupon(req.params._cartid, couponId, function(err, cart){
+						if(err){
+							throw err;
+						}
+
+						res.status(200).json(cart);
+				});
+			});
 		});
 
 	cartRouter.route('/:_cartid/coupons/:_couponid')
 		.delete(function(req,res){
-			var responseJson = { title : "remove coupon from cart" };
+			var couponId = req.params._couponid;
+			var cartId = req.params._cartid;
+			
+			Cart.getCartById(cartId, function(err, cart){
+				if(err){
+					throw err;
+				}
 
-			res.status(200).json(responseJson)
-		})
+				if (cart.couponId == couponId){
+					Cart.useCoupon(cartId, "", function(err, cart){
+						if(err){
+							throw err;
+						}
+
+						res.status(200).json(cart);
+					});
+				}
+			});
+		});
+
+	cartRouter.route('/:_cartid/totals')
+		.get(function(req,res){
+			var cartId = req.params._cartid;
+			Cart.getCartById(cartId, function(err, cart){
+				if(err){
+					throw err;
+				}
+
+				var productIds = [];
+
+				for(index in cart.items){
+					productIds.push(cart.items[index].productId); 
+				}
+
+				Product.GetProductsByIds(productIds, function(err, products){
+					var totalAmt = 0;
+
+					for(index in products){
+						totalAmt += products[index].price;
+					}
+					if (cart.couponId != null){
+						Coupon.getCouponById(cart.couponId, function(err, coupon){
+							if (err){
+								res.json(totalAmt);
+							} else{
+								totalAmt -= coupon.value;
+								res.json(totalAmt);
+							}
+						});
+					}else{
+						res.json(totalAmt);
+					}
+				});
+			});
+		});
 
 	return cartRouter;
 };
