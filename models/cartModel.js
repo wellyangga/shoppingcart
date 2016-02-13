@@ -1,5 +1,9 @@
 var mongoose = require('mongoose');
 
+var itemSchema = mongoose.Schema({
+	productId : String
+});
+
 var cartSchema = mongoose.Schema({
 	code:{
 		type: Number,
@@ -9,8 +13,8 @@ var cartSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	items: [{ type : mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-	_couponId:{ type : mongoose.Schema.Types.ObjectId, ref: 'Coupon' }
+	items: [itemSchema],
+	couponId:String
 });
 
 var Cart = module.exports = mongoose.model('Cart', cartSchema);
@@ -38,4 +42,43 @@ module.exports.updateCart = function(id, cart, options, callback){
 module.exports.removeCart = function(id, callback){
 	var query = { _id:id };
 	Cart.remove(query, callback);
+}
+
+module.exports.addItemsToChart =  function(id, itemIds, options, callback){
+	var query = {_id : id };
+	var update = {
+		items: []
+	};
+	for(var index in itemIds){
+		update.items.push({ productId : itemIds[index].id });
+	}
+
+	Cart.findOneAndUpdate(query, update, options, callback);
+}
+
+module.exports.removeItemsFromChart =  function(id, removedItemId, options, callback){
+	var query = {_id : id };
+	var cartObj = {};
+
+	Cart.findById(id, function(err,cart){
+		cartObj = cart;
+
+		var update = {
+			items: []
+		};
+
+		for(var index in cartObj.items){
+			if (cartObj.items[index].productId != removedItemId){
+				update.items.push(
+					{ 
+						_id : cartObj.items[index]._id,
+						productId : cartObj.items[index].productId 
+					});
+			}
+		}
+
+		Cart.findOneAndUpdate(query, update, options, callback);
+	}); 
+
+
 }

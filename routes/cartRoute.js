@@ -44,7 +44,7 @@ var routes = function(Cart, Product, Coupon){
 		})
 		.delete(function(req, res){
 			var id = req.params._cartid;
-			Coupon.removeCart(id, function(err, cart){
+			Cart.removeCart(id, function(err, cart){
 				if(err){
 					throw err;
 				}
@@ -55,22 +55,32 @@ var routes = function(Cart, Product, Coupon){
 	// items
 	cartRouter.route('/:_cartid/items')
 		.get(function(req, res){
-			var responseJson = { title : "show items in cart" };
-
-			res.json(responseJson);
+			Cart.getCartById(req.params._cartid, function(err, cart){
+				if(err){
+					throw err;
+				}
+				res.json(cart.items);
+			});
 		})
 		.post(function(req,res){
-			var responseJson = { title : "add item to cart" };
-
-			res.status(201).json(responseJson)
+			var productIds = req.body.productIds;
+			Cart.addItemsToChart(req.params._cartid, productIds, {}, function(err, cart){
+				if(err){
+					throw err;
+				}
+				res.json(cart);
+			});
 		});
 
 
 	cartRouter.route('/:_cartid/items/:_productid')
 		.delete(function(req, res){
-			var responseJson = { title : "remove product from cart" };
-
-			res.json(responseJson);
+			Cart.removeItemsFromChart(req.params._cartid, req.params._productid, {}, function(err,cart){
+				if(err){
+					throw err;
+				}
+				res.json("removed");
+			});
 		});
 
 	// coupons
