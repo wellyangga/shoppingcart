@@ -5,19 +5,23 @@ var couponSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	type:String,
+	couponType:{
+		type: String,
+		required: true
+	},
 	value:{
 		type: Number,
 		required: true
 	},
-	isUsed: Boolean,
-	startDate: Date,
-	expiryDate: Date
+	isUsed: { 
+		type: Boolean, 
+		default: false
+	}
 });
 
 var Coupon = module.exports = mongoose.model('Coupon', couponSchema);
 
-module.exports.getCoupon = function(callback, limit){
+module.exports.getCoupons = function(callback, limit){
 	Coupon.find(callback).limit(limit);
 }
 

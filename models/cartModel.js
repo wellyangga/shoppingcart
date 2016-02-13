@@ -9,8 +9,8 @@ var cartSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	items:[],
-	_couponId:String
+	items: [{ type : mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+	_couponId:{ type : mongoose.Schema.Types.ObjectId, ref: 'Coupon' }
 });
 
 var Cart = module.exports = mongoose.model('Cart', cartSchema);

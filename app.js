@@ -13,7 +13,7 @@ Coupon = require('./models/couponModel');
 Product = require('./models/productModel');
 
 // define routes
-cartRouter = require('./routes/cartRoute')(Cart);
+cartRouter = require('./routes/cartRoute')(Cart,Product,Coupon);
 couponRouter = require('./routes/couponRoute')(Coupon);
 productRouter = require('./routes/productRoute')(Product);
 

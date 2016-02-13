@@ -5,12 +5,53 @@ var routes = function(Product){
 
 	productRouter.route('/')
 		.get(function(req, res){
-			var responseJson = { title : "product api" };
-
-			res.json(responseJson);
+			Product.getProducts(function(err, product){
+			if(err){
+					throw err;
+				}
+				res.json(product);
+			});
+		})
+		.post(function(req,res){
+			var product = req.body;
+			Product.addProduct(product, function(err, product){
+				if(err){
+					throw err;
+				}
+				res.status(201).json(product);
+			});
 		});
 
-		return productRouter;
+	productRouter.route('/:_productid')
+		.get(function(req, res){
+			Product.getProductById(req.params._productid, function(err, product){
+				if(err){
+					throw err;
+				}
+				res.json(product);
+			});
+		})
+		.put(function(req, res){
+			var id = req.params._productid;
+			var product = req.body;
+			Product.updateProduct(id, product, {}, function(err, product){
+				if(err){
+					throw err;
+				}
+				res.json(product);
+			});
+		})
+		.delete(function(req, res){
+			var id = req.params._productid;
+			Product.removeProduct(id, function(err, product){
+				if(err){
+					throw err;
+				}
+				res.json(product);
+			});
+		});
+
+	return productRouter;
 };
 
 module.exports = routes;

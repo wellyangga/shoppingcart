@@ -26,13 +26,14 @@ module.exports.getProductById = function(id, callback){
 }
 
 module.exports.addProduct = function(product, callback){
-	Product.create(coupon, callback);
+	Product.create(product, callback);
 }
 
 module.exports.updateProduct = function(id, product, options, callback){
 	var query = {_id : id };
 	var update = {
-		value: coupon.value
+		title: product.title,
+		price: product.price
 	};
 	Product.findOneAndUpdate(query, update, options, callback);
 }
